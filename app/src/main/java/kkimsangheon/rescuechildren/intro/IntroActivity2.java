@@ -1,4 +1,4 @@
-package kkimsangheon.rescuechildren;
+package kkimsangheon.rescuechildren.intro;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,6 +7,9 @@ import android.os.Handler;
 import android.os.Message;
 
 import java.lang.ref.WeakReference;
+
+import kkimsangheon.rescuechildren.MainActivity;
+import kkimsangheon.rescuechildren.R;
 
 /**
  * Created by 상헌 on 2016-07-24.

@@ -1,4 +1,4 @@
-package kkimsangheon.rescuechildren;
+package kkimsangheon.rescuechildren.intro;
 
 /**
  * Created by SangHeon on 2018-08-01.
@@ -11,6 +11,8 @@ import android.os.Handler;
 import android.os.Message;
 
 import java.lang.ref.WeakReference;
+
+import kkimsangheon.rescuechildren.R;
 
 /**
  * Created by 상헌 on 2016-07-23.
