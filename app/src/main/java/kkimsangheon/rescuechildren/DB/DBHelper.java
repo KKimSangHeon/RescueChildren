@@ -89,6 +89,26 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
+    // 학생삭제할 때
+    public void deleteStudent(Student student) {
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("DELETE FROM IN_OUT_MANAGE WHERE 1 = 1 ");
+
+        if (!student.getId().equals("")) {
+            sb.append("AND STUDENT_ID = '" + student.getId() + "'");
+        }
+        db.execSQL(sb.toString());
+
+        StringBuffer sb2 = new StringBuffer();
+        sb2.append("DELETE FROM STUDENT WHERE 1 = 1 ");
+
+        if (!student.getId().equals("")) {
+            sb2.append("AND ID = '" + student.getId() + "'");
+        }
+        db.execSQL(sb2.toString());
+    }
+
 
     // 학생조회할 때  ( 학생 등록 및 관리에서 검색할 때 , 등하차시스템에서 내리지 않은 학생 판단할 때 사용)
     public ArrayList<Student> selectRegisteredStudentList(Student student) {
@@ -98,12 +118,12 @@ public class DBHelper extends SQLiteOpenHelper {
         StringBuffer sb = new StringBuffer();
         sb.append(" SELECT ID, NAME, CLASS_NAME, IS_OUT, PARENT_PHONE_NUMBER FROM STUDENT WHERE 1=1");
 
-        if (!student.getName().equals("") ) {
+        if (!student.getName().equals("")) {
             sb.append(" AND NAME LIKE '%" + student.getName() + "%'");
         }
 
 
-        if (!student.getId().equals("") ) {
+        if (!student.getId().equals("")) {
             sb.append(" AND ID = '" + student.getId() + "'");
         }
 
@@ -126,6 +146,7 @@ public class DBHelper extends SQLiteOpenHelper {
     // 기록 확인할 때
 
     // 태깅하였을 때
+
     public void tagging(Student student) {
         // 5분 이내에 다시 찍었을 경우 이미 처리되었다고 출력
 

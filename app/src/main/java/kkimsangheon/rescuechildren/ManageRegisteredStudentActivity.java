@@ -69,7 +69,7 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
         mNFCTechLists = new String[][]{new String[]{NfcF.class.getName()}};
 
         ((Button) findViewById(R.id.registerStudentButton)).setOnClickListener(onClickRegisterStudent);
-
+        ((Button) findViewById(R.id.deleteAllStudentButton)).setOnClickListener(onClickDeleteAllStudent);
 
 
         ((EditText) findViewById(R.id.selectStudentName)).addTextChangedListener(textWatcherInput);
@@ -78,6 +78,35 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
         getStudentList(new Student());
 
     }
+
+    View.OnClickListener onClickDeleteAllStudent = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String message ="한번 데이터를 지우면 복구할 수 없습니다. 지우시겠습니까?";
+
+            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(ManageRegisteredStudentActivity.this); // 빌더 객체 생성
+            alertBuilder.setTitle("등록된 데이터 제거") // 제목
+                    .setMessage(message) // 내용
+                    .setCancelable(false)
+                    .setPositiveButton("Yes",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    DBHelper.getInstance(ManageRegisteredStudentActivity.this).deleteStudent(new Student());
+                                    Toast.makeText(ManageRegisteredStudentActivity.this, "등록된 모든 데이터가 제거되었습니다.", Toast.LENGTH_LONG).show();
+                                    getStudentList(new Student());
+                                }
+                            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();  // 대회상자 종료
+                }
+            })
+                    .show();
+
+        }
+    };
+
+
 
     View.OnClickListener onClickRegisterStudent = new View.OnClickListener() {
         @Override
@@ -161,7 +190,7 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
 
     private class CustomAdapter extends ArrayAdapter<Student> {
         ArrayList<Student> studentList;
-        Student student;
+
         public CustomAdapter(Context context, int textViewResourceId, ArrayList<Student> studentList) {
             super(context, textViewResourceId, studentList);
             this.studentList = studentList;
@@ -170,7 +199,7 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
 
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            student = studentList.get(position);
+            final Student student = studentList.get(position);
 
             View v = convertView;
             if (v == null) {
@@ -201,8 +230,7 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
             deleteStudentButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                            String message = "";
-                            message ="삭제대상"+"\nName : "+ student.getName() + "\nClass Name: " +   student.getClassName() + "\nID: "+student.getId() + "\nP/N: " + student.getParentPhoneNumber();
+                            String message ="삭제대상"+"\nName : "+ student.getName() + "\nClass Name: " +   student.getClassName() + "\nID: "+student.getId() + "\nP/N: " + student.getParentPhoneNumber();
 
                             AlertDialog.Builder alertBuilder = new AlertDialog.Builder(ManageRegisteredStudentActivity.this); // 빌더 객체 생성
                             alertBuilder.setTitle("등록된 데이터 제거") // 제목
@@ -211,8 +239,9 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
                                     .setPositiveButton("Yes",
                                             new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                           //         DBHelper.getInstance(ManageRegisteredStudentActivity.this).deleteStudent(student);
+                                                    DBHelper.getInstance(ManageRegisteredStudentActivity.this).deleteStudent(student);
                                                     Toast.makeText(ManageRegisteredStudentActivity.this, student.getName()+"님의 데이터가 제거되었습니다.", Toast.LENGTH_LONG).show();
+                                                    getStudentList(new Student());
                                                 }
 
 
