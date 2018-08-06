@@ -36,7 +36,6 @@ import kkimsangheon.rescuechildren.NFCHelper.NFCReadHelper;
 public class ManageRegisteredStudentActivity extends NFCReadHelper {
     ListView listView;
     Boolean isRegisterStudentMode = false;
-    int finalCost = 20000;
     AlertDialog alertDialog;
     AlertDialog.Builder alertDialogBuilder = null;
     private ArrayList<Student> studentList;
@@ -162,7 +161,7 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
 
     private class CustomAdapter extends ArrayAdapter<Student> {
         ArrayList<Student> studentList;
-
+        Student student;
         public CustomAdapter(Context context, int textViewResourceId, ArrayList<Student> studentList) {
             super(context, textViewResourceId, studentList);
             this.studentList = studentList;
@@ -170,6 +169,8 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
+
+            student = studentList.get(position);
 
             View v = convertView;
             if (v == null) {
@@ -179,49 +180,39 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
 
             // 리스트뷰 내 item의 name 설정
             TextView studentNameTextView = (TextView) v.findViewById(R.id.studentName);
-            studentNameTextView.setText("Name: " + studentList.get(position).getName());
+            studentNameTextView.setText("Name: " + student.getName());
 
             TextView classNameTextView = (TextView) v.findViewById(R.id.className);
-            classNameTextView.setText("Class Name: " + studentList.get(position).getClassName());
+            classNameTextView.setText("Class Name: " + student.getClassName());
 
             TextView studentIdTextView = (TextView) v.findViewById(R.id.studentId);
-            studentIdTextView.setText("ID: " + studentList.get(position).getId());
+            studentIdTextView.setText("ID: " + student.getId());
 
             TextView parentPhoneNumberTextView = (TextView) v.findViewById(R.id.parentPhoneNumber);
-            parentPhoneNumberTextView.setText("P/N: " + studentList.get(position).getParentPhoneNumber());
+            parentPhoneNumberTextView.setText("P/N: " + student.getParentPhoneNumber());
 
             // ImageView 인스턴스
             ImageView imageView = (ImageView) v.findViewById(R.id.imageView);
+            // 추 후 사진적용할 때 사용
 
 
-//            // 리스트뷰의 아이템에 이미지를 변경한다.
-//            if ("감자옹심이".equals(items.get(position))) {
-////                upimage.setImageResource(R.drawable.ic_launcher);
-//                imageView.setImageResource(R.drawable.ic_launcher);
-//                classNameTextView.setText("8000 Won");
-//
-//                studentIdTextView.setText("♥ 16");
-//
-//            }
-//
-//            final String text = items.get(position);
             ImageButton deleteStudentButton = (ImageButton) v.findViewById(R.id.deleteStudentButton);
 
             deleteStudentButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                            String message = "";
+                            message ="삭제대상"+"\nName : "+ student.getName() + "\nClass Name: " +   student.getClassName() + "\nID: "+student.getId() + "\nP/N: " + student.getParentPhoneNumber();
 
-                    if ("감자옹심이".equals("")) {
-                        if (finalCost - 8000 >= 0) {
                             AlertDialog.Builder alertBuilder = new AlertDialog.Builder(ManageRegisteredStudentActivity.this); // 빌더 객체 생성
-                            alertBuilder.setTitle("주문확인") // 제목
-                                    .setMessage("감자옹심이를 주문하시겠습니까?\n현재 잔액:" + finalCost) // 내용
+                            alertBuilder.setTitle("등록된 데이터 제거") // 제목
+                                    .setMessage(message) // 내용
                                     .setCancelable(false)
                                     .setPositiveButton("Yes",
                                             new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                                    finalCost = finalCost - 8000;
-                                                    Toast.makeText(ManageRegisteredStudentActivity.this, "감자옹심이 주문 완료되었습니다. 잔액:" + finalCost, Toast.LENGTH_SHORT).show();
+                                           //         DBHelper.getInstance(ManageRegisteredStudentActivity.this).deleteStudent(student);
+                                                    Toast.makeText(ManageRegisteredStudentActivity.this, student.getName()+"님의 데이터가 제거되었습니다.", Toast.LENGTH_LONG).show();
                                                 }
 
 
@@ -234,13 +225,12 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
                                     .show();
 
 
-                        }
-                    }
                 }
             });
 
             return v;
         }
+
     }
 
 }
