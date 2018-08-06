@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import kkimsangheon.rescuechildren.DB.DBHelper;
 import kkimsangheon.rescuechildren.DB.VO.Student;
 import kkimsangheon.rescuechildren.NFCHelper.NFCReadHelper;
 
@@ -31,18 +32,18 @@ import kkimsangheon.rescuechildren.NFCHelper.NFCReadHelper;
  * Created by SangHeon on 2018-08-06.
  */
 
-public class RegisteredStudentManager extends NFCReadHelper {
+public class ManageRegisteredStudentActivity extends NFCReadHelper {
     ListView listView;
     Boolean isRegisterStudentMode = false;
     int finalCost = 20000;
     AlertDialog alertDialog;
     AlertDialog.Builder alertDialogBuilder = null;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_registered_student_manager);
+        setContentView(R.layout.activity_manage_registered_student);
+
 
         // NFC 어댑터를 구한다
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -72,7 +73,7 @@ public class RegisteredStudentManager extends NFCReadHelper {
             public void onClick(View v) {
 
                 isRegisterStudentMode = true;
-                alertDialogBuilder = new AlertDialog.Builder(RegisteredStudentManager.this).setTitle("Touch tag to write");
+                alertDialogBuilder = new AlertDialog.Builder(ManageRegisteredStudentActivity.this).setTitle("Touch tag to write");
                 alertDialog = alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {
@@ -117,13 +118,27 @@ public class RegisteredStudentManager extends NFCReadHelper {
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Student student;
+        Student tempStudent = new Student();
+        ArrayList<Student> idDupList = new ArrayList<>();
+        String resultMessage = "";
 
         if (isRegisterStudentMode == false) {
-            Toast.makeText(this, super.strRec + "학생 등록 버튼을 누르고 등록해주세요", Toast.LENGTH_SHORT).show();
-       }else{
+            Toast.makeText(this, super.strRec + "학생 등록 버튼을 누르고 등록해주세요", Toast.LENGTH_LONG).show();
+        }else{
 
             student = getParsedStudentData(super.strRec);
-            Toast.makeText(this, student.getName() + " 학생 등록 완료", Toast.LENGTH_SHORT).show();
+
+            // 이미등록된 학생인지 판단
+            tempStudent.setId(student.getId());
+            idDupList = DBHelper.getInstance(this).selectRegisteredStudentList(tempStudent);
+
+            if( idDupList.size() == 0 ) {
+                DBHelper.getInstance(this).insertStudent(student);
+                resultMessage = student.getName() + " 학생 등록 완료";
+            } else {
+                resultMessage = "ID:"+idDupList.get(0).getId() + " 이름:"+ idDupList.get(0).getName()+" 이미 등록되어있습니다.";
+            }
+            Toast.makeText(this, resultMessage, Toast.LENGTH_LONG).show();
             alertDialog.cancel();
         }
     }
@@ -177,7 +192,7 @@ public class RegisteredStudentManager extends NFCReadHelper {
 
                     if ("감자옹심이".equals(text)) {
                         if (finalCost - 8000 >= 0) {
-                            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(RegisteredStudentManager.this); // 빌더 객체 생성
+                            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(ManageRegisteredStudentActivity.this); // 빌더 객체 생성
                             alertBuilder.setTitle("주문확인") // 제목
                                     .setMessage("감자옹심이를 주문하시겠습니까?\n현재 잔액:" + finalCost) // 내용
                                     .setCancelable(false)
@@ -185,7 +200,7 @@ public class RegisteredStudentManager extends NFCReadHelper {
                                             new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int whichButton) {
                                                     finalCost = finalCost - 8000;
-                                                    Toast.makeText(RegisteredStudentManager.this, "감자옹심이 주문 완료되었습니다. 잔액:" + finalCost, Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(ManageRegisteredStudentActivity.this, "감자옹심이 주문 완료되었습니다. 잔액:" + finalCost, Toast.LENGTH_SHORT).show();
                                                 }
 
 

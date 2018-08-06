@@ -16,13 +16,23 @@ import kkimsangheon.rescuechildren.DB.VO.Student;
  */
 
 public class DBHelper extends SQLiteOpenHelper {
-    private Context context;
     public static final int DB_VERSION = 2;
+    public static final String DB_NAME = "SH";
+    public static DBHelper dbHelper = null;
+    private Context context;
+    private SQLiteDatabase db;
 
-
-    public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+    private DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
         this.context = context;
+        db = this.getWritableDatabase();
+    }
+
+    public static DBHelper getInstance(Context context) { // 싱글턴 패턴
+        if (dbHelper == null) {
+            dbHelper = new DBHelper(context, DB_NAME, null, DB_VERSION);
+        }
+        return dbHelper;
     }
 
     /**
@@ -44,8 +54,8 @@ public class DBHelper extends SQLiteOpenHelper {
         sb2.append(" LONGITUDE TEXT, ");  // 위도
         sb2.append(" LATITUDE TEXT, ");  // 경도
         sb2.append(" IN_OUT_TIME DATE, ");  //
-        sb2.append(" IS_MANUAL INTEGER ");  //
-        sb2.append(" STUDENT_ID TEXT ");  //
+        sb2.append(" IS_MANUAL INTEGER, ");  //
+        sb2.append(" STUDENT_ID TEXT, ");  //
         sb2.append(" CONSTRAINT STUDENT_ID FOREIGN KEY(STUDENT_ID) REFERENCES STUDENT(ID)) ");  //
 
         db.execSQL(sb.toString());
@@ -64,8 +74,6 @@ public class DBHelper extends SQLiteOpenHelper {
     // 학생등록할 때
     public void insertStudent(Student student) {
 
-        SQLiteDatabase db = getWritableDatabase();
-
         StringBuffer sb = new StringBuffer();
         sb.append(" INSERT INTO STUDENT ( ");
         sb.append(" ID, NAME, CLASS_NAME, IS_OUT, PARENT_PHONE_NUMBER ) ");
@@ -83,18 +91,17 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
     // 학생조회할 때  ( 학생 등록 및 관리에서 검색할 때 , 등하차시스템에서 내리지 않은 학생 판단할 때 사용)
-    ArrayList<Student> getRegisteredStudentList(Student student) {
+    public ArrayList<Student> selectRegisteredStudentList(Student student) {
         ArrayList<Student> resultLIst = new ArrayList<>();
         Student resultStudent;
 
         StringBuffer sb = new StringBuffer();
         sb.append(" SELECT ID, NAME, CLASS_NAME, IS_OUT, PARENT_PHONE_NUMBER FROM STUDENT WHERE 1=1");
 
-        if (!student.getName().equals("")) {
+        if (!student.getName().equals("") ) {
             sb.append(" AND NAME LIKE '%" + student.getName() + "%'");
         }
 
-        SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(sb.toString(), null);
 
         while (cursor.moveToNext()) {
@@ -104,7 +111,6 @@ public class DBHelper extends SQLiteOpenHelper {
             resultStudent.setClassName(cursor.getString(2));
             resultStudent.setIsOut(cursor.getInt(3));
             resultStudent.setParentPhoneNumber(cursor.getString(4));
-            resultStudent.setIsOut(cursor.getInt(5));
             resultLIst.add(resultStudent);
         }
         return resultLIst;
@@ -127,8 +133,4 @@ public class DBHelper extends SQLiteOpenHelper {
     // 조회 할 때
 
 
-    /** * */
-    public void testDB() {
-        SQLiteDatabase db = getReadableDatabase();
-    }
 }

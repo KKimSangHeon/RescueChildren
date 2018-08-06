@@ -21,7 +21,7 @@ public class ManageInOutActivity extends NFCReadHelper {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_in_out_manager);
+        setContentView(R.layout.activity_manage_in_out);
 
         // NFC 어댑터를 구한다
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);

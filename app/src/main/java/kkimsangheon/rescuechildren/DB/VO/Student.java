@@ -12,6 +12,14 @@ public class Student {
     private String parentPhoneNumber;
     private int isOut;  //최근 승차했는지 하차했는지 여부
 
+    public Student() {
+        this.id = "";
+        this.name = "";
+        this.className = "";
+        this.parentPhoneNumber ="";
+        this.isOut = 1;
+    }
+
     public String getId() {   return id;    }
 
     public void setId(String id) {  this.id = id;   }

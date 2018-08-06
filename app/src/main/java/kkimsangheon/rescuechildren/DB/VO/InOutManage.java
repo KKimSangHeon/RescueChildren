@@ -11,6 +11,14 @@ public class InOutManage {
     private String inOutTime;
     private int isManual;       //태깅이 아닌 수동으로 처리했을경우
 
+    public InOutManage() {
+        this.studentId = "";
+        this.longitude = "";
+        this.latitude = "";
+        this.inOutTime = "";
+        this.isManual = 0;
+    }
+
     public String getStudentId() {
         return studentId;
     }
