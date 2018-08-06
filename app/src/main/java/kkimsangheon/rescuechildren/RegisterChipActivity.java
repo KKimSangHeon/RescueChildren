@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -92,10 +93,10 @@ public class RegisterChipActivity extends Activity {
             try {
                 lang = Locale.getDefault().getLanguage().getBytes("UTF-8");
                 // NFC에 입력될 text
-                inputString = ((TextView) findViewById(R.id.studentId)).getText().toString();
-                inputString += "/" + ((TextView) findViewById(R.id.name)).getText().toString();
-                inputString += "/" + ((TextView) findViewById(R.id.className)).getText().toString();
-                inputString += "/" + ((TextView) findViewById(R.id.parentPhoneNumber)).getText().toString();
+                inputString = ((EditText) findViewById(R.id.studentId)).getText().toString();
+                inputString += "/" + ((EditText) findViewById(R.id.name)).getText().toString();
+                inputString += "/" + ((EditText) findViewById(R.id.className)).getText().toString();
+                inputString += "/" + ((EditText) findViewById(R.id.parentPhoneNumber)).getText().toString();
 
                 text = inputString.getBytes("UTF-8"); // Content in UTF-8
 

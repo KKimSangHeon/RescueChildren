@@ -25,7 +25,7 @@
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
             android:paddingTop="15dp"
-            android:src="@drawable/ic_launcher" />
+            android:src="@drawable/man" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -35,7 +35,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/studentName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="17dp"
@@ -43,29 +43,34 @@
 
 
             <TextView
-                android:id="@+id/price"
+                android:id="@+id/className"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15dp"
                 android:textStyle="" />
 
             <TextView
-                android:id="@+id/detail"
+                android:id="@+id/studentId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textColor="#FF0000"
+                android:textSize="15dp" />
+            <TextView
+                android:id="@+id/parentPhoneNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
                 android:textSize="15dp" />
 
         </LinearLayout>
 
         <ImageButton
-            android:id="@+id/button"
+            android:id="@+id/deleteStudentButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
             android:padding="0dp"
-            android:src="@drawable/ic_launcher"
+            android:src="@drawable/trash"
             android:text="Order" />
     </LinearLayout>
 </LinearLayout>

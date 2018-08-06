@@ -102,6 +102,11 @@ public class DBHelper extends SQLiteOpenHelper {
             sb.append(" AND NAME LIKE '%" + student.getName() + "%'");
         }
 
+
+        if (!student.getId().equals("") ) {
+            sb.append(" AND ID = '" + student.getId() + "'");
+        }
+
         Cursor cursor = db.rawQuery(sb.toString(), null);
 
         while (cursor.moveToNext()) {

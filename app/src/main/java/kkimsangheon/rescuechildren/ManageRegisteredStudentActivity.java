@@ -1,6 +1,5 @@
 package kkimsangheon.rescuechildren;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -10,12 +9,14 @@ import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
 import android.nfc.tech.NfcF;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -38,6 +39,7 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
     int finalCost = 20000;
     AlertDialog alertDialog;
     AlertDialog.Builder alertDialogBuilder = null;
+    private ArrayList<Student> studentList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,40 +69,54 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
         }
         mNFCTechLists = new String[][]{new String[]{NfcF.class.getName()}};
 
-        ((Button) findViewById(R.id.registerStudentButton)).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                isRegisterStudentMode = true;
-                alertDialogBuilder = new AlertDialog.Builder(ManageRegisteredStudentActivity.this).setTitle("Touch tag to write");
-                alertDialog = alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        isRegisterStudentMode = false;
-                    }
-
-                }).create();
-                alertDialog.show();
-
-            }
-        });
+        ((Button) findViewById(R.id.registerStudentButton)).setOnClickListener(onClickRegisterStudent);
 
 
+
+        ((EditText) findViewById(R.id.selectStudentName)).addTextChangedListener(textWatcherInput);
         listView = (ListView) this.findViewById(R.id.listView);
 
-        ArrayList<String> items = new ArrayList<>();
+        getStudentList(new Student());
 
-        items.add("감자옹심이");
-        items.add("콧등치기");
-        items.add("황기닭백숙");
-        items.add("한정식");
-        items.add("한정식");
-        items.add("한정식");
-        items.add("한정식");
-        items.add("한정식");
+    }
 
-        CustomAdapter adapter = new CustomAdapter(this, 0, items);
+    View.OnClickListener onClickRegisterStudent = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            isRegisterStudentMode = true;
+            alertDialogBuilder = new AlertDialog.Builder(ManageRegisteredStudentActivity.this).setTitle("Touch tag to write");
+            alertDialog = alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    isRegisterStudentMode = false;
+                }
+
+            }).create();
+            alertDialog.show();
+        }
+    };
+
+    TextWatcher textWatcherInput = new TextWatcher() {
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            Student student = new Student();
+            student.setName(s.toString());
+            getStudentList(student);
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+        }
+    };
+
+    public void getStudentList(Student student) {
+        // student list 조회
+        studentList = DBHelper.getInstance(ManageRegisteredStudentActivity.this).selectRegisteredStudentList(student);
+        CustomAdapter adapter = new CustomAdapter(this, 0, studentList);
         listView.setAdapter(adapter);
     }
 
@@ -124,7 +140,7 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
 
         if (isRegisterStudentMode == false) {
             Toast.makeText(this, super.strRec + "학생 등록 버튼을 누르고 등록해주세요", Toast.LENGTH_LONG).show();
-        }else{
+        } else {
 
             student = getParsedStudentData(super.strRec);
 
@@ -132,65 +148,70 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
             tempStudent.setId(student.getId());
             idDupList = DBHelper.getInstance(this).selectRegisteredStudentList(tempStudent);
 
-            if( idDupList.size() == 0 ) {
+            if (idDupList.size() == 0) {
                 DBHelper.getInstance(this).insertStudent(student);
                 resultMessage = student.getName() + " 학생 등록 완료";
+                getStudentList(new Student());
             } else {
-                resultMessage = "ID:"+idDupList.get(0).getId() + " 이름:"+ idDupList.get(0).getName()+" 이미 등록되어있습니다.";
+                resultMessage = "ID: " + idDupList.get(0).getId() + " 이름: " + idDupList.get(0).getName() + "\n이미 등록되어있습니다.";
             }
             Toast.makeText(this, resultMessage, Toast.LENGTH_LONG).show();
             alertDialog.cancel();
         }
     }
 
-    private class CustomAdapter extends ArrayAdapter<String> {
-        private ArrayList<String> items;
+    private class CustomAdapter extends ArrayAdapter<Student> {
+        ArrayList<Student> studentList;
 
-        public CustomAdapter(Context context, int textViewResourceId, ArrayList<String> objects) {
-            super(context, textViewResourceId, objects);
-            this.items = objects;
+        public CustomAdapter(Context context, int textViewResourceId, ArrayList<Student> studentList) {
+            super(context, textViewResourceId, studentList);
+            this.studentList = studentList;
+
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
+
             View v = convertView;
             if (v == null) {
                 LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 v = vi.inflate(R.layout.list_view_item, null);
             }
 
+            // 리스트뷰 내 item의 name 설정
+            TextView studentNameTextView = (TextView) v.findViewById(R.id.studentName);
+            studentNameTextView.setText("Name: " + studentList.get(position).getName());
 
-            //음식 종류 쓰기
-            TextView textView = (TextView) v.findViewById(R.id.textView);
-            textView.setText(items.get(position));
+            TextView classNameTextView = (TextView) v.findViewById(R.id.className);
+            classNameTextView.setText("Class Name: " + studentList.get(position).getClassName());
 
-            //잔액
+            TextView studentIdTextView = (TextView) v.findViewById(R.id.studentId);
+            studentIdTextView.setText("ID: " + studentList.get(position).getId());
 
+            TextView parentPhoneNumberTextView = (TextView) v.findViewById(R.id.parentPhoneNumber);
+            parentPhoneNumberTextView.setText("P/N: " + studentList.get(position).getParentPhoneNumber());
 
             // ImageView 인스턴스
             ImageView imageView = (ImageView) v.findViewById(R.id.imageView);
-//            ImageView upimage = (ImageView) v.findViewById(R.id.upimage);
-            TextView priceView = (TextView) v.findViewById(R.id.price);
-            TextView detailView = (TextView) v.findViewById(R.id.detail);
 
 
-            // 리스트뷰의 아이템에 이미지를 변경한다.
-            if ("감자옹심이".equals(items.get(position))) {
-//                upimage.setImageResource(R.drawable.ic_launcher);
-                imageView.setImageResource(R.drawable.ic_launcher);
-                priceView.setText("8000 Won");
+//            // 리스트뷰의 아이템에 이미지를 변경한다.
+//            if ("감자옹심이".equals(items.get(position))) {
+////                upimage.setImageResource(R.drawable.ic_launcher);
+//                imageView.setImageResource(R.drawable.ic_launcher);
+//                classNameTextView.setText("8000 Won");
+//
+//                studentIdTextView.setText("♥ 16");
+//
+//            }
+//
+//            final String text = items.get(position);
+            ImageButton deleteStudentButton = (ImageButton) v.findViewById(R.id.deleteStudentButton);
 
-                detailView.setText("♥ 16");
-
-            }
-
-            final String text = items.get(position);
-            ImageButton button = (ImageButton) v.findViewById(R.id.button);
-
-            button.setOnClickListener(new View.OnClickListener() {
+            deleteStudentButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    if ("감자옹심이".equals(text)) {
+                    if ("감자옹심이".equals("")) {
                         if (finalCost - 8000 >= 0) {
                             AlertDialog.Builder alertBuilder = new AlertDialog.Builder(ManageRegisteredStudentActivity.this); // 빌더 객체 생성
                             alertBuilder.setTitle("주문확인") // 제목
