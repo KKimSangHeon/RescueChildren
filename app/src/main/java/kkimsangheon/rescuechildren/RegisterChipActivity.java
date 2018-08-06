@@ -40,7 +40,7 @@ public class RegisterChipActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_chip);
 
-        ((Button) findViewById(R.id.button)).setOnClickListener(new OnClickListener() {
+        ((Button) findViewById(R.id.registerButton)).setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -78,6 +78,9 @@ public class RegisterChipActivity extends Activity {
 
     @Override
     protected void onNewIntent(Intent intent) {
+
+        //id는 중복검사 후 추가 가능하도록 플래그 추가예정
+
         // Tag writing mode
         if (mWriteMode && NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
             Tag detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
@@ -85,9 +88,18 @@ public class RegisterChipActivity extends Activity {
 
             byte[] lang = new byte[0];
             byte[] text = new byte[0];
+            String inputString;
             try {
                 lang = Locale.getDefault().getLanguage().getBytes("UTF-8");
-                text = ((TextView) findViewById(R.id.value)).getText().toString().getBytes("UTF-8"); // Content in UTF-8
+                // NFC에 입력될 text
+                inputString = ((TextView) findViewById(R.id.studentId)).getText().toString();
+                inputString += "/" + ((TextView) findViewById(R.id.name)).getText().toString();
+                inputString += "/" + ((TextView) findViewById(R.id.className)).getText().toString();
+                inputString += "/" + ((TextView) findViewById(R.id.parentPhoneNumber)).getText().toString();
+
+                text = inputString.getBytes("UTF-8"); // Content in UTF-8
+
+
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }

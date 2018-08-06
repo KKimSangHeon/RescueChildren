@@ -18,6 +18,11 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
+    public void registerStudent(View v) {
+        Intent intent = new Intent(this, InOutManageActivity.class);
+        startActivity(intent);
+    }
+
     public void startSystem(View v) {
         Intent intent = new Intent(this, InOutManageActivity.class);
         startActivity(intent);

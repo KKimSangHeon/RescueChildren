@@ -5,24 +5,31 @@
     android:orientation="vertical">
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:text="NFC 등록"
         android:id="@+id/registerChip"
-        android:onClick="registerChip"/>
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:onClick="registerChip"
+        android:text="NFC 등록" />
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:text="등/하차시스템 동작"
+        android:id="@+id/registerStudent"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:onClick="registerStudent"
+        android:text="학생등록" />
+
+    <Button
         android:id="@+id/startSystem"
-        android:onClick="startSystem"/>
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:onClick="startSystem"
+        android:text="등/하차시스템 동작" />
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:text="기록확인"
         android:id="@+id/showHistory"
-        android:onClick="showHistory"/>
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:onClick="showHistory"
+        android:text="기록확인" />
 
 </LinearLayout>
