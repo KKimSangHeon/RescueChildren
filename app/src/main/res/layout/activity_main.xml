@@ -15,8 +15,8 @@
         android:id="@+id/registerStudent"
         android:layout_width="300dp"
         android:layout_height="50dp"
-        android:onClick="registerStudent"
-        android:text="학생등록" />
+        android:onClick="registeredStudentManage"
+        android:text="학생등록 및 관리" />
 
     <Button
         android:id="@+id/startSystem"

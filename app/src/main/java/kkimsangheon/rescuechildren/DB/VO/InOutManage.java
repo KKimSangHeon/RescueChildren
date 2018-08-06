@@ -8,8 +8,7 @@ public class InOutManage {
     private String studentId;   // foreign key
     private String longitude;
     private String latitude;
-    private String getInTime;
-    private String getOutTime;
+    private String inOutTime;
     private int isManual;       //태깅이 아닌 수동으로 처리했을경우
 
     public String getStudentId() {
@@ -36,20 +35,12 @@ public class InOutManage {
         this.latitude = latitude;
     }
 
-    public String getGetInTime() {
-        return getInTime;
+    public String getInOutTime() {
+        return inOutTime;
     }
 
-    public void setGetInTime(String getInTime) {
-        this.getInTime = getInTime;
-    }
-
-    public String getGetOutTime() {
-        return getOutTime;
-    }
-
-    public void setGetOutTime(String getOutTime) {
-        this.getOutTime = getOutTime;
+    public void setInOutTime(String inOutTime) {
+        this.inOutTime = inOutTime;
     }
 
     public int getIsManual() {

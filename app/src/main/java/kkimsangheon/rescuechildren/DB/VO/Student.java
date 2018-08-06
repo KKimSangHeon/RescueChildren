@@ -8,17 +8,13 @@ public class Student {
 
     private String id;   // primary key
     private String name;
-    private String classId;
+    private String className;
     private String parentPhoneNumber;
-    private int inOutFlag;  //최근 승차했는지 하차했는지 여부
+    private int isOut;  //최근 승차했는지 하차했는지 여부
 
-    public String getId() {
-        return id;
-    }
+    public String getId() {   return id;    }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public void setId(String id) {  this.id = id;   }
 
     public String getName() {
         return name;
@@ -28,12 +24,12 @@ public class Student {
         this.name = name;
     }
 
-    public String getClassId() {
-        return classId;
+    public String getClassName() {
+        return className;
     }
 
-    public void setClassId(String classId) {
-        this.classId = classId;
+    public void setClassName(String className) {
+        this.className = className;
     }
 
     public String getParentPhoneNumber() {
@@ -44,11 +40,11 @@ public class Student {
         this.parentPhoneNumber = parentPhoneNumber;
     }
 
-    public int getInOutFlag() {
-        return inOutFlag;
+    public int getIsOut() {
+        return isOut;
     }
 
-    public void setInOutFlag(int inOutFlag) {
-        this.inOutFlag = inOutFlag;
+    public void setIsOut(int isOut) {
+        this.isOut = isOut;
     }
 }

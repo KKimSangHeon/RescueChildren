@@ -40,7 +40,7 @@ public class RegisterChipActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_chip);
 
-        ((Button) findViewById(R.id.registerButton)).setOnClickListener(new OnClickListener() {
+        ((Button) findViewById(R.id.registerNFCButton)).setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {

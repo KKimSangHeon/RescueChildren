@@ -1,8 +1,4 @@
-package kkimsangheon.rescuechildren;
-
-/**
- * Created by SangHeon on 2018-08-01.
- */
+package kkimsangheon.rescuechildren.NFCHelper;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -11,56 +7,30 @@ import android.content.IntentFilter;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
-import android.nfc.tech.NfcF;
-import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.StringTokenizer;
 
+import kkimsangheon.rescuechildren.DB.VO.Student;
 
-public class InOutManageActivity extends Activity {
-    TextView mTextView;
-    NfcAdapter mNfcAdapter; // NFC 어댑터
-    PendingIntent mPendingIntent; // 수신받은 데이터가 저장된 인텐트
-    IntentFilter[] mIntentFilters; // 인텐트 필터
-    String[][] mNFCTechLists;
-    ArrayList<String> childList = new ArrayList<>();
+/**
+ * Created by SangHeon on 2018-08-06.
+ */
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_in_out_manager);
+public class NFCReadHelper extends Activity {
+    protected TextView mTextView;
+    protected NfcAdapter mNfcAdapter; // NFC 어댑터
+    protected PendingIntent mPendingIntent; // 수신받은 데이터가 저장된 인텐트
+    protected IntentFilter[] mIntentFilters; // 인텐트 필터
+    protected String[][] mNFCTechLists;
+    protected String strRec = "";
 
-        // NFC 어댑터를 구한다
-        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        // NFC 어댑터가 null 이라면 칩이 존재하지 않는 것으로 간주
-        if (mNfcAdapter == null) {
-            mTextView.setText("This phone is not NFC enable.");
-            return;
-        }
-
-        // NFC 데이터 활성화에 필요한 인텐트를 생성
-        Intent intent = new Intent(this, getClass());
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        mPendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        // NFC 데이터 활성화에 필요한 인텐트 필터를 생성
-        IntentFilter iFilter = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
-        try {
-            iFilter.addDataType("*/*");
-            mIntentFilters = new IntentFilter[]{iFilter};
-        } catch (Exception e) {
-            mTextView.setText("Make IntentFilter error");
-        }
-        mNFCTechLists = new String[][]{new String[]{NfcF.class.getName()}};
-    }
-
-    public void onResume() {
-        super.onResume();
-        // 앱이 실행될때 NFC 어댑터를 활성화 한다
+    protected void enableNFCReadMode() {
+        //  NFC 어댑터를 활성화 한다
         if (mNfcAdapter != null)
             mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilters, mNFCTechLists);
 
@@ -70,8 +40,7 @@ public class InOutManageActivity extends Activity {
             onNewIntent(getIntent());
     }
 
-    public void onPause() {
-        super.onPause();
+    protected void disableNFCReadMode() {
         // 앱이 종료될때 NFC 어댑터를 비활성화 한다
         if (mNfcAdapter != null)
             mNfcAdapter.disableForegroundDispatch(this);
@@ -86,7 +55,6 @@ public class InOutManageActivity extends Activity {
         String tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG).toString();
         String strMsg = action + "\n\n" + tag;
         // 액션 정보와 태그 정보를 화면에 출력
-        //   mTextView.setText(strMsg);
 
         // 인텐트에서 NDEF 메시지 배열을 구한다
         Parcelable[] messages = intent.getParcelableArrayExtra(
@@ -98,8 +66,7 @@ public class InOutManageActivity extends Activity {
     }
 
     // NDEF 메시지를 화면에 출력
-    public void showMsg(NdefMessage mMessage) {
-        String strMsg = "", strRec = "";
+    private void showMsg(NdefMessage mMessage) {
         // NDEF 메시지에서 NDEF 레코드 배열을 구한다
         NdefRecord[] recs = mMessage.getRecords();
         for (int i = 0; i < recs.length; i++) {
@@ -116,18 +83,11 @@ public class InOutManageActivity extends Activity {
                 strRec = new String(payload, 0, payload.length);
                 strRec = "URI: " + strRec;
             }
-            strMsg += ("\n\nNdefRecord[" + i + "]:\n" + strRec);
-
-            childList.add(strRec);
-            Toast.makeText(this,childList.toString(),Toast.LENGTH_SHORT).show();
-            //  Intent intent1 = new Intent(MainActivity.this, KoreanMenuActivity.class);
-            //  startActivity(intent1);
-
         }
     }
 
     // 버퍼 데이터를 디코딩해서 String 으로 변환
-    public String byteDecoding(byte[] buf) {
+    private String byteDecoding(byte[] buf) {
         String strText = "";
         String textEncoding;
         if ((buf[0] & 0200) == 0)
@@ -143,6 +103,19 @@ public class InOutManageActivity extends Activity {
             Log.d("tag1", e.toString());
         }
         return strText;
+    }
+
+    protected Student getParsedStudentData(String str) {
+        Student student = new Student();
+
+        StringTokenizer st = new StringTokenizer(str, "/");
+
+        student.setId(st.nextToken());
+        student.setName(st.nextToken());
+        student.setClassName(st.nextToken());
+        student.setParentPhoneNumber(st.nextToken());
+
+        return student;
     }
 
 }

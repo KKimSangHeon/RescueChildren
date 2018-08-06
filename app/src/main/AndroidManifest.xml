@@ -24,7 +24,11 @@
         <activity android:name=".MainActivity" >
         </activity>
 
-        <activity android:name=".InOutManageActivity" >
+        <activity android:name=".ManageInOutActivity" >
+        </activity>
+
+
+        <activity android:name=".RegisteredStudentManager" >
         </activity>
 
         <activity android:name=".RegisterChipActivity" >

@@ -5,7 +5,6 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-
     <EditText
         android:id="@+id/studentId"
         android:layout_width="fill_parent"
@@ -30,9 +29,8 @@
         android:layout_height="wrap_content"
         android:hint="Input Parent P/N" />
 
-
     <Button
-        android:id="@+id/registerButton"
+        android:id="@+id/registerNFCButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start write modus" />
