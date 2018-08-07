@@ -105,7 +105,7 @@ public class ShowHistoryActivity extends Activity {
             classNameTextView.setText("Class Name: " + inOutManage.getStudent().getClassName());
 
             TextView studentIdTextView = (TextView) v.findViewById(R.id.textView3);
-            studentIdTextView.setText((inOutManage.getIsOut() == 0 ? "승차시간" : "하차시간") + inOutManage.getInOutTime());
+            studentIdTextView.setText((inOutManage.getIsOut() == 0 ? "승차: " : "하차: ") + inOutManage.getInOutTime());
 
             TextView parentPhoneNumberTextView = (TextView) v.findViewById(R.id.textView4);
             parentPhoneNumberTextView.setText("수동처리 여부: " + (inOutManage.getIsManual() == 1 ? 'Y' : 'N'));

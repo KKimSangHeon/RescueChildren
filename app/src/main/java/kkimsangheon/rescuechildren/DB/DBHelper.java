@@ -54,10 +54,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
         StringBuffer sb2 = new StringBuffer();
         sb2.append(" CREATE TABLE IN_OUT_MANAGE ( ");
-        sb2.append(" SEQ INTEGER PRIMARY KEY AUTOINCREMENT, ");
         sb2.append(" LONGITUDE TEXT, ");  // 위도
         sb2.append(" LATITUDE TEXT, ");  // 경도
-        sb2.append(" IN_OUT_TIME DATE, ");  //
+        sb2.append(" IN_OUT_TIME TEXT, ");  //
         sb2.append(" IS_MANUAL INTEGER, ");  //
         sb2.append(" STUDENT_ID TEXT, ");  //
         sb2.append(" IS_OUT TEXT, ");  //
@@ -65,6 +64,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         db.execSQL(sb.toString());
         db.execSQL(sb2.toString());
+        db.execSQL("PRAGMA foreign_keys=on;");
         Toast.makeText(context, "DB 구축완료", Toast.LENGTH_SHORT).show();
     }
 
@@ -97,6 +97,16 @@ public class DBHelper extends SQLiteOpenHelper {
     // 학생삭제할 때
     public void deleteStudent(Student student) {
 
+        ArrayList<Student> studentArrayList;
+        Student paramStudent = new Student();
+        paramStudent.setName(student.getName());
+        studentArrayList = selectRegisteredStudentList(paramStudent);
+
+        InOutManage paramInOutManage = new InOutManage();
+        for (Student tempStudent : studentArrayList) {
+            paramInOutManage.setStudentId(tempStudent.getId());
+            deleteInOutManage(paramInOutManage);
+        }
 
         StringBuffer sb = new StringBuffer();
         sb.append("DELETE FROM STUDENT WHERE 1 = 1 ");
@@ -107,6 +117,21 @@ public class DBHelper extends SQLiteOpenHelper {
 
         if (!student.getName().equals("")) {
             sb.append("AND NAME LIKE '%" + student.getName() + "%'");
+        }
+
+        db.execSQL(sb.toString());
+
+    }
+
+    // 학생삭제할 때
+    public void deleteInOutManage(InOutManage inOutManage) {
+
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("DELETE FROM IN_OUT_MANAGE WHERE 1 = 1 ");
+
+        if (!inOutManage.getStudentId().equals("")) {
+            sb.append("AND STUDENT_ID = '" + inOutManage.getStudentId() + "'");
         }
 
         db.execSQL(sb.toString());
@@ -131,7 +156,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
         if (student.getIsOut() == 0) {
             sb.append(" AND IS_OUT = 0");
-
         }
 
         Cursor cursor = db.rawQuery(sb.toString(), null);
@@ -149,14 +173,34 @@ public class DBHelper extends SQLiteOpenHelper {
         return resultLIst;
     }
 
-    // 기록 확인할 때
 
     // 전체하차 할 때
     public void updateAllOutState(Student student, InOutManage inOutManage) {
 
         long time = System.currentTimeMillis();
-        SimpleDateFormat dayTime = new SimpleDateFormat("mm월dd hh:mm:ss");
+        SimpleDateFormat dayTime = new SimpleDateFormat("MM월dd hh:mm:ss");
         String dateStr = dayTime.format(new Date(time));
+        ArrayList<Student> studentList;
+
+        Student paramStudent = new Student();
+        paramStudent.setIsOut(0);
+        paramStudent.setName(student.getName());
+        studentList = selectRegisteredStudentList(paramStudent);
+
+        for (Student tempStudent : studentList) {
+            InOutManage paramInOutManage = new InOutManage();
+            paramInOutManage.setStudentId(tempStudent.getId());
+            paramInOutManage.setIsManual(1);
+            paramInOutManage.setLatitude(inOutManage.getLatitude());
+            paramInOutManage.setLongitude(inOutManage.getLongitude());
+            paramInOutManage.setIsOut(1);
+            paramInOutManage.setInOutTime(dateStr);
+
+            insertInOutManage(paramInOutManage);
+
+        }
+
+
 
         StringBuffer sb = new StringBuffer();
         sb.append("UPDATE STUDENT SET IS_OUT = 1, CURRENT_TAG_TIME = '" + dateStr + "' WHERE IS_OUT=0 ");
@@ -167,15 +211,6 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(sb.toString());
 
 
-        InOutManage paramInOutManage = new InOutManage();
-        paramInOutManage.setIsManual(1);
-        paramInOutManage.setLatitude(inOutManage.getLatitude());
-        paramInOutManage.setLongitude(inOutManage.getLongitude());
-        paramInOutManage.setIsOut(1);
-        paramInOutManage.setInOutTime(dateStr);
-
-        insertInOutManage(paramInOutManage);
-
     }
 
     // 태깅하였을 때
@@ -183,7 +218,7 @@ public class DBHelper extends SQLiteOpenHelper {
         // 5분 이내에 다시 찍었을 경우 이미 처리되었다고 출력
 
         long time = System.currentTimeMillis();
-        SimpleDateFormat dayTime = new SimpleDateFormat("mm월dd hh:mm:ss");
+        SimpleDateFormat dayTime = new SimpleDateFormat("MM월dd hh:mm:ss");
         String dateStr = dayTime.format(new Date(time));
 
         StringBuffer sb = new StringBuffer();
@@ -192,6 +227,7 @@ public class DBHelper extends SQLiteOpenHelper {
             sb.append(" WHERE ID = '" + student.getId() + "'");
         }
         db.execSQL(sb.toString());
+
 
         InOutManage paramInOutManage = new InOutManage();
         paramInOutManage.setStudentId(student.getId());
@@ -228,13 +264,13 @@ public class DBHelper extends SQLiteOpenHelper {
     public ArrayList<InOutManage> selectInOutMange(Student student) {
         StringBuffer sb = new StringBuffer();
         ArrayList<InOutManage> resultList = new ArrayList<>();
-        sb.append(" SELECT STUDENT.ID, STUDENT.NAME, STUDENT.CLASS_NAME, STUDENT.PARENT_PHONE_NUMBER, IN_OUT_MANAGE.SEQ,IN_OUT_MANAGE.LONGITUDE,IN_OUT_MANAGE.LATITUDE ,IN_OUT_MANAGE.IN_OUT_TIME ,IN_OUT_MANAGE.IS_MANUAL, IN_OUT_MANAGE.IS_OUT FROM IN_OUT_MANAGE LEFT JOIN STUDENT ON IN_OUT_MANAGE.STUDENT_ID = STUDENT.ID");
+        sb.append(" SELECT STUDENT.ID, STUDENT.NAME, STUDENT.CLASS_NAME, STUDENT.PARENT_PHONE_NUMBER, IN_OUT_MANAGE.LONGITUDE,IN_OUT_MANAGE.LATITUDE ,IN_OUT_MANAGE.IN_OUT_TIME ,IN_OUT_MANAGE.IS_MANUAL, IN_OUT_MANAGE.IS_OUT FROM IN_OUT_MANAGE LEFT JOIN STUDENT ON IN_OUT_MANAGE.STUDENT_ID = STUDENT.ID");
 
         if (!student.getName().equals("")) {
             sb.append(" WHERE NAME LIKE '%" + student.getName() + "%'");
         }
 
-        sb.append(" ORDER BY SEQ");
+        sb.append(" ORDER BY IN_OUT_MANAGE.IN_OUT_TIME");
 
         Cursor cursor = db.rawQuery(sb.toString(), null);
 
@@ -249,11 +285,11 @@ public class DBHelper extends SQLiteOpenHelper {
             tempInOutManage.setStudent(tempStudent);
 
 
-            tempInOutManage.setLongitude(cursor.getString(5));
-            tempInOutManage.setLatitude(cursor.getString(6));
-            tempInOutManage.setInOutTime(cursor.getString(7));
-            tempInOutManage.setIsManual(cursor.getInt(8));
-            tempInOutManage.setIsOut(cursor.getInt(9));
+            tempInOutManage.setLongitude(cursor.getString(4));
+            tempInOutManage.setLatitude(cursor.getString(5));
+            tempInOutManage.setInOutTime(cursor.getString(6));
+            tempInOutManage.setIsManual(cursor.getInt(7));
+            tempInOutManage.setIsOut(cursor.getInt(8));
 
             resultList.add(tempInOutManage);
         }

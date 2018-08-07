@@ -226,6 +226,8 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
             ImageView imageView = (ImageView) v.findViewById(R.id.imageView);
             // 추 후 사진적용할 때 사용
 
+            ImageButton imageButton = (ImageButton) v.findViewById(R.id.imageButton);
+            imageButton.setBackgroundColor(0x000000);
 
             ImageButton deleteStudentButton = (ImageButton) v.findViewById(R.id.imageButton);
 

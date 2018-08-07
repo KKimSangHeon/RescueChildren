@@ -234,7 +234,7 @@ public class ManageInOutActivity extends NFCReadHelper {
             parentPhoneNumberTextView.setText("P/N: " + student.getParentPhoneNumber());
 
             TextView curretnTagTimeTextView = (TextView) v.findViewById(R.id.textView4);
-            curretnTagTimeTextView.setText("승차시간: " + student.getCurrentTagTime());
+            curretnTagTimeTextView.setText("승차: " + student.getCurrentTagTime());
 
             // ImageView 인스턴스
             ImageView imageView = (ImageView) v.findViewById(R.id.imageView);
@@ -264,7 +264,7 @@ public class ManageInOutActivity extends NFCReadHelper {
                                             paramStudent.setIsOut(1);
 
                                             InOutManage paramInOutManage = new InOutManage();
-
+                                            paramInOutManage.setIsManual(1);
                                             DBHelper.getInstance(ManageInOutActivity.this).updateInOutState(paramStudent, paramInOutManage);
 
                                             paramStudent = new Student();
