@@ -30,6 +30,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import kkimsangheon.rescuechildren.DB.DBHelper;
+import kkimsangheon.rescuechildren.DB.VO.InOutManage;
 import kkimsangheon.rescuechildren.DB.VO.Student;
 import kkimsangheon.rescuechildren.NFCHelper.NFCReadHelper;
 
@@ -89,9 +90,18 @@ public class ManageInOutActivity extends NFCReadHelper {
                     .setPositiveButton("Yes",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    DBHelper.getInstance(ManageInOutActivity.this).deleteStudent(new Student());
+
+                                    Student paramStudent = new Student();
+                                    paramStudent.setName(((EditText) findViewById(R.id.selectStudentName)).getText().toString());
+
+                                    InOutManage paramInOutManage = new InOutManage();
+                                    DBHelper.getInstance(ManageInOutActivity.this).updateAllOutState(paramStudent, paramInOutManage);
+
                                     Toast.makeText(ManageInOutActivity.this, "모든학생이 하차처리 되었습니다..", Toast.LENGTH_LONG).show();
-                                    getStudentList(new Student());
+
+                                    paramStudent = new Student();
+                                    paramStudent.setIsOut(0);
+                                    getStudentList(paramStudent);
                                 }
                             }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                 @Override
@@ -108,9 +118,10 @@ public class ManageInOutActivity extends NFCReadHelper {
     TextWatcher textWatcherInput = new TextWatcher() {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            Student student = new Student();
-            student.setName(s.toString());
-            getStudentList(student);
+            Student paramStudent = new Student();
+            paramStudent.setIsOut(0);
+            paramStudent.setName(s.toString());
+            getStudentList(paramStudent);
         }
 
         @Override
@@ -143,23 +154,53 @@ public class ManageInOutActivity extends NFCReadHelper {
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Student student;
-        Student tempStudent = new Student();
         String resultMessage = "";
+        Student paramStudent;
+        InOutManage paramInOutManage;
+        Student queryResultStudent;
 
+        ArrayList<Student> studentList = new ArrayList<>();
         student = getParsedStudentData(super.strRec);
 
-        // 이미등록된 학생인지 판단
-        tempStudent.setId(student.getId());
 
-        DBHelper.getInstance(this).insertStudent(student);
+        // ID로 등록되어있는 칩인지 확인
+        paramStudent = new Student();
+        paramStudent.setId(student.getId());
+        studentList = DBHelper.getInstance(this).selectRegisteredStudentList(paramStudent);
 
-//        if(하차)
-        resultMessage = student.getName() + " 학생 하차 완료";
+        if (studentList.size() == 0) {
+            Toast.makeText(this, "칩을 먼저 등록해주세요", Toast.LENGTH_LONG).show();
+            return;
+        }
 
-        resultMessage = student.getName() + " 학생 승차 완료";
-        getStudentList(new Student());
+        // 등록되어있을 경우 Student 테이블의 IS_OUT 갱신 및 IN_OUT_MANAGE에 삽입
+        queryResultStudent = DBHelper.getInstance(this).selectRegisteredStudentList(student).get(0);
+
+
+        paramStudent = new Student();
+        paramStudent.setId(queryResultStudent.getId());
+
+        if (queryResultStudent.getIsOut() == 0) {
+            resultMessage = queryResultStudent.getName() + " 학생 하차 완료";
+            paramStudent.setIsOut(1);
+        } else {
+            resultMessage = queryResultStudent.getName() + " 학생 승차 완료";
+            paramStudent.setIsOut(0);
+        }
+
+        paramInOutManage = new InOutManage();
+
+        // InOutManage에 위도 경도 세팅하는 모듈추가
+
+
+        DBHelper.getInstance(this).updateInOutState(paramStudent, paramInOutManage);
+
         Toast.makeText(this, resultMessage, Toast.LENGTH_LONG).show();
 //            alertDialog.cancel();
+
+        paramStudent = new Student();
+        paramStudent.setIsOut(0);
+        getStudentList(paramStudent);
     }
 
 
@@ -189,15 +230,18 @@ public class ManageInOutActivity extends NFCReadHelper {
             TextView classNameTextView = (TextView) v.findViewById(R.id.textView2);
             classNameTextView.setText("Class Name: " + student.getClassName());
 
-            TextView studentIdTextView = (TextView) v.findViewById(R.id.textView3);
-            studentIdTextView.setText("P/N: " + student.getParentPhoneNumber());
+            TextView parentPhoneNumberTextView = (TextView) v.findViewById(R.id.textView3);
+            parentPhoneNumberTextView.setText("P/N: " + student.getParentPhoneNumber());
 
-            TextView parentPhoneNumberTextView = (TextView) v.findViewById(R.id.textView4);
-            parentPhoneNumberTextView.setText("승차시간: " + student.getParentPhoneNumber());
+            TextView curretnTagTimeTextView = (TextView) v.findViewById(R.id.textView4);
+            curretnTagTimeTextView.setText("승차시간: " + student.getCurrentTagTime());
 
             // ImageView 인스턴스
             ImageView imageView = (ImageView) v.findViewById(R.id.imageView);
             // 추 후 사진적용할 때 사용
+
+            ImageButton imageButton = (ImageButton) v.findViewById(R.id.imageButton);
+            imageButton.setImageResource(R.drawable.out);
 
 
             ImageButton deleteStudentButton = (ImageButton) v.findViewById(R.id.imageButton);
@@ -205,18 +249,29 @@ public class ManageInOutActivity extends NFCReadHelper {
             deleteStudentButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String message = "삭제대상" + "\nName : " + student.getName() + "\nClass Name: " + student.getClassName() + "\nID: " + student.getId() + "\nP/N: " + student.getParentPhoneNumber();
+                    String message = student.getClassName() + " 반의 " + student.getName() + " 학생을 수동 하차처리 하시겠습니까";
 
                     AlertDialog.Builder alertBuilder = new AlertDialog.Builder(ManageInOutActivity.this); // 빌더 객체 생성
-                    alertBuilder.setTitle("등록된 데이터 제거") // 제목
+                    alertBuilder.setTitle("수동 하차 처리") // 제목
                             .setMessage(message) // 내용
                             .setCancelable(false)
                             .setPositiveButton("Yes",
                                     new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {
-                                            DBHelper.getInstance(ManageInOutActivity.this).deleteStudent(student);
-                                            Toast.makeText(ManageInOutActivity.this, student.getName() + "님의 데이터가 제거되었습니다.", Toast.LENGTH_LONG).show();
-                                            getStudentList(new Student());
+
+                                            Student paramStudent = new Student();
+                                            paramStudent.setId(student.getId());
+                                            paramStudent.setIsOut(1);
+
+                                            InOutManage paramInOutManage = new InOutManage();
+
+                                            DBHelper.getInstance(ManageInOutActivity.this).updateInOutState(paramStudent, paramInOutManage);
+
+                                            paramStudent = new Student();
+                                            paramStudent.setIsOut(0);
+                                            getStudentList(paramStudent);
+
+                                            Toast.makeText(ManageInOutActivity.this, student.getName() + "학생 수동 하처치리 되었습니다.", Toast.LENGTH_LONG).show();
                                         }
 
 

@@ -18,7 +18,7 @@ public class InOutManage {
         this.latitude = "";
         this.inOutTime = "";
         this.isManual = 0;
-        this.isOut = 0;
+        this.isOut = -1;
     }
 
     public int getIsOut() {

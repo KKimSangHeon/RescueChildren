@@ -10,6 +10,7 @@ public class Student {
     private String name;
     private String className;
     private String parentPhoneNumber;
+    private String currentTagTime;
     private int isOut;  //최근 승차했는지 하차했는지 여부
 
     public Student() {
@@ -17,7 +18,16 @@ public class Student {
         this.name = "";
         this.className = "";
         this.parentPhoneNumber = "";
-        this.isOut = 1;
+        this.currentTagTime = "";
+        this.isOut = -1;
+    }
+
+    public String getCurrentTagTime() {
+        return currentTagTime;
+    }
+
+    public void setCurrentTagTime(String currentTagTime) {
+        this.currentTagTime = currentTagTime;
     }
 
     public String getId() {

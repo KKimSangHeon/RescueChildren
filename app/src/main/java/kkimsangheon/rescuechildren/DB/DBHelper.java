@@ -6,8 +6,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
+import kkimsangheon.rescuechildren.DB.VO.InOutManage;
 import kkimsangheon.rescuechildren.DB.VO.Student;
 
 /**
@@ -45,6 +48,7 @@ public class DBHelper extends SQLiteOpenHelper {
         sb.append(" ID TEXT PRIMARY KEY , ");
         sb.append(" NAME TEXT, ");
         sb.append(" CLASS_NAME TEXT, ");
+        sb.append(" CURRENT_TAG_TIME TEXT, ");
         sb.append(" IS_OUT INTEGER, ");  //  0 이면 승차
         sb.append(" PARENT_PHONE_NUMBER TEXT ) "); // SQLite Database로 쿼리 실행
 
@@ -114,15 +118,19 @@ public class DBHelper extends SQLiteOpenHelper {
         Student resultStudent;
 
         StringBuffer sb = new StringBuffer();
-        sb.append(" SELECT ID, NAME, CLASS_NAME, IS_OUT, PARENT_PHONE_NUMBER FROM STUDENT WHERE 1=1");
+        sb.append(" SELECT ID, NAME, CLASS_NAME, IS_OUT, PARENT_PHONE_NUMBER,CURRENT_TAG_TIME FROM STUDENT WHERE 1=1");
 
         if (!student.getName().equals("")) {
             sb.append(" AND NAME LIKE '%" + student.getName() + "%'");
         }
 
-
         if (!student.getId().equals("")) {
             sb.append(" AND ID = '" + student.getId() + "'");
+        }
+
+        if (student.getIsOut() == 0) {
+            sb.append(" AND IS_OUT = 0");
+
         }
 
         Cursor cursor = db.rawQuery(sb.toString(), null);
@@ -134,20 +142,79 @@ public class DBHelper extends SQLiteOpenHelper {
             resultStudent.setClassName(cursor.getString(2));
             resultStudent.setIsOut(cursor.getInt(3));
             resultStudent.setParentPhoneNumber(cursor.getString(4));
+            resultStudent.setCurrentTagTime(cursor.getString(5));
             resultLIst.add(resultStudent);
         }
         return resultLIst;
     }
 
-    // 내리지 않은 학생 조회할 때
-
     // 기록 확인할 때
 
-    // 태깅하였을 때
+    // 전체하차 할 때
+    public void updateAllOutState(Student student, InOutManage inOutManage) {
 
-    public void tagging(Student student) {
+        long time = System.currentTimeMillis();
+        SimpleDateFormat dayTime = new SimpleDateFormat("mm월dd hh:mm:ss");
+        String dateStr = dayTime.format(new Date(time));
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("UPDATE STUDENT SET IS_OUT = 1, CURRENT_TAG_TIME = '" + dateStr + "' WHERE IS_OUT=0 ");
+
+        if (!student.getName().equals("")) {
+            sb.append(" AND NAME LIKE '%" + student.getName() + "%'");
+        }
+        db.execSQL(sb.toString());
+
+
+        InOutManage paramInOutManage = new InOutManage();
+        paramInOutManage.setIsManual(1);
+        paramInOutManage.setLatitude(inOutManage.getLatitude());
+        paramInOutManage.setLongitude(inOutManage.getLongitude());
+        paramInOutManage.setIsOut(1);
+        paramInOutManage.setInOutTime(dateStr);
+
+        insertInOutManage(paramInOutManage);
+
+    }
+
+    // 태깅하였을 때
+    public void updateInOutState(Student student, InOutManage inOutManage) {
         // 5분 이내에 다시 찍었을 경우 이미 처리되었다고 출력
 
+        long time = System.currentTimeMillis();
+        SimpleDateFormat dayTime = new SimpleDateFormat("mm월dd hh:mm:ss");
+        String dateStr = dayTime.format(new Date(time));
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("UPDATE STUDENT SET IS_OUT = " + student.getIsOut() + ", CURRENT_TAG_TIME = '" + dateStr + "'");
+        if (!student.getId().equals("")) {
+            sb.append(" WHERE ID = '" + student.getId() + "'");
+        }
+        db.execSQL(sb.toString());
+
+        InOutManage paramInOutManage = new InOutManage();
+        paramInOutManage.setIsManual(inOutManage.getIsManual());
+        paramInOutManage.setLatitude(inOutManage.getLatitude());
+        paramInOutManage.setLongitude(inOutManage.getLongitude());
+        paramInOutManage.setIsOut(student.getIsOut());
+        paramInOutManage.setInOutTime(dateStr);
+
+        insertInOutManage(paramInOutManage);
+    }
+
+    public void insertInOutManage(InOutManage inOutManage) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(" INSERT INTO IN_OUT_MANAGE ( ");
+        sb.append(" STUDENT_ID , LONGITUDE , LATITUDE , IN_OUT_TIME , IS_MANUAL  ) ");
+        sb.append(" VALUES( ? , ? , ?, ?, ?) ");
+
+        db.execSQL(sb.toString(), new Object[]{
+                inOutManage.getStudentId(),
+                inOutManage.getLongitude(),
+                inOutManage.getLatitude(),
+                inOutManage.getInOutTime(),
+                inOutManage.getIsManual()
+        });
 
     }
 
