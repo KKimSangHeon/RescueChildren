@@ -10,6 +10,7 @@ public class InOutManage {
     private String latitude;
     private String inOutTime;
     private int isManual;       //태깅이 아닌 수동으로 처리했을경우
+    private int isOut;          //승차인지 하차인지 구분
 
     public InOutManage() {
         this.studentId = "";
@@ -17,6 +18,15 @@ public class InOutManage {
         this.latitude = "";
         this.inOutTime = "";
         this.isManual = 0;
+        this.isOut = 0;
+    }
+
+    public int getIsOut() {
+        return isOut;
+    }
+
+    public void setIsOut(int isOut) {
+        this.isOut = isOut;
     }
 
     public String getStudentId() {

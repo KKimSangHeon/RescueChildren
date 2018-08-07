@@ -34,6 +34,10 @@
         <activity android:name=".RegisterChipActivity" >
         </activity>
 
+        <activity android:name=".ShowHistoryActivity" >
+        </activity>
+
+
     </application>
 
 </manifest>

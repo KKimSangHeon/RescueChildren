@@ -6,7 +6,7 @@
     tools:context=".MainActivity">
 
     <EditText
-        android:id="@+id/studentId"
+        android:id="@+id/textView3"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:hint="Input ID" />
@@ -18,13 +18,13 @@
         android:hint="Input Name" />
 
     <EditText
-        android:id="@+id/className"
+        android:id="@+id/textView2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:hint="Input Class Name" />
 
     <EditText
-        android:id="@+id/parentPhoneNumber"
+        android:id="@+id/textView4"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:hint="Input Parent P/N" />

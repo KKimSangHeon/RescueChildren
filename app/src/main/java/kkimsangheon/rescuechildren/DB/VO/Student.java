@@ -16,13 +16,17 @@ public class Student {
         this.id = "";
         this.name = "";
         this.className = "";
-        this.parentPhoneNumber ="";
+        this.parentPhoneNumber = "";
         this.isOut = 1;
     }
 
-    public String getId() {   return id;    }
+    public String getId() {
+        return id;
+    }
 
-    public void setId(String id) {  this.id = id;   }
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

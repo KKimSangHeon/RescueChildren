@@ -91,7 +91,9 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
                     .setPositiveButton("Yes",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    DBHelper.getInstance(ManageRegisteredStudentActivity.this).deleteStudent(new Student());
+                                    Student student = new Student();
+                                    student.setName(((EditText) findViewById(R.id.selectStudentName)).getText().toString());
+                                    DBHelper.getInstance(ManageRegisteredStudentActivity.this).deleteStudent(student);
                                     Toast.makeText(ManageRegisteredStudentActivity.this, "등록된 모든 데이터가 제거되었습니다.", Toast.LENGTH_LONG).show();
                                     getStudentList(new Student());
                                 }
@@ -184,7 +186,7 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
                 resultMessage = "ID: " + idDupList.get(0).getId() + " 이름: " + idDupList.get(0).getName() + "\n이미 등록되어있습니다.";
             }
             Toast.makeText(this, resultMessage, Toast.LENGTH_LONG).show();
-            alertDialog.cancel();
+//            alertDialog.cancel();
         }
     }
 
@@ -208,16 +210,16 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
             }
 
             // 리스트뷰 내 item의 name 설정
-            TextView studentNameTextView = (TextView) v.findViewById(R.id.studentName);
+            TextView studentNameTextView = (TextView) v.findViewById(R.id.textView1);
             studentNameTextView.setText("Name: " + student.getName());
 
-            TextView classNameTextView = (TextView) v.findViewById(R.id.className);
+            TextView classNameTextView = (TextView) v.findViewById(R.id.textView2);
             classNameTextView.setText("Class Name: " + student.getClassName());
 
-            TextView studentIdTextView = (TextView) v.findViewById(R.id.studentId);
+            TextView studentIdTextView = (TextView) v.findViewById(R.id.textView3);
             studentIdTextView.setText("ID: " + student.getId());
 
-            TextView parentPhoneNumberTextView = (TextView) v.findViewById(R.id.parentPhoneNumber);
+            TextView parentPhoneNumberTextView = (TextView) v.findViewById(R.id.textView4);
             parentPhoneNumberTextView.setText("P/N: " + student.getParentPhoneNumber());
 
             // ImageView 인스턴스
@@ -225,7 +227,7 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
             // 추 후 사진적용할 때 사용
 
 
-            ImageButton deleteStudentButton = (ImageButton) v.findViewById(R.id.deleteStudentButton);
+            ImageButton deleteStudentButton = (ImageButton) v.findViewById(R.id.imageButton);
 
             deleteStudentButton.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -56,7 +56,7 @@ public class DBHelper extends SQLiteOpenHelper {
         sb2.append(" IN_OUT_TIME DATE, ");  //
         sb2.append(" IS_MANUAL INTEGER, ");  //
         sb2.append(" STUDENT_ID TEXT, ");  //
-        sb2.append(" CONSTRAINT STUDENT_ID FOREIGN KEY(STUDENT_ID) REFERENCES STUDENT(ID)) ");  //
+        sb2.append(" CONSTRAINT STUDENT_ID FOREIGN KEY(STUDENT_ID) REFERENCES STUDENT(ID) ON DELETE CASCADE) ");  //
 
         db.execSQL(sb.toString());
         db.execSQL(sb2.toString());
@@ -92,21 +92,19 @@ public class DBHelper extends SQLiteOpenHelper {
     // 학생삭제할 때
     public void deleteStudent(Student student) {
 
+
         StringBuffer sb = new StringBuffer();
-        sb.append("DELETE FROM IN_OUT_MANAGE WHERE 1 = 1 ");
+        sb.append("DELETE FROM STUDENT WHERE 1 = 1 ");
 
         if (!student.getId().equals("")) {
-            sb.append("AND STUDENT_ID = '" + student.getId() + "'");
+            sb.append("AND ID = '" + student.getId() + "'");
         }
+
+        if (!student.getName().equals("")) {
+            sb.append("AND NAME LIKE '%" + student.getName() + "%'");
+        }
+
         db.execSQL(sb.toString());
-
-        StringBuffer sb2 = new StringBuffer();
-        sb2.append("DELETE FROM STUDENT WHERE 1 = 1 ");
-
-        if (!student.getId().equals("")) {
-            sb2.append("AND ID = '" + student.getId() + "'");
-        }
-        db.execSQL(sb2.toString());
     }
 
 
