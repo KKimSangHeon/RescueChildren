@@ -242,7 +242,7 @@ public class ManageInOutActivity extends NFCReadHelper {
 
             ImageButton imageButton = (ImageButton) v.findViewById(R.id.imageButton);
             imageButton.setImageResource(R.drawable.out);
-
+            imageButton.setBackgroundColor(0x000000);
 
             ImageButton deleteStudentButton = (ImageButton) v.findViewById(R.id.imageButton);
 

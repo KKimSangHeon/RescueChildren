@@ -60,6 +60,7 @@ public class DBHelper extends SQLiteOpenHelper {
         sb2.append(" IN_OUT_TIME DATE, ");  //
         sb2.append(" IS_MANUAL INTEGER, ");  //
         sb2.append(" STUDENT_ID TEXT, ");  //
+        sb2.append(" IS_OUT TEXT, ");  //
         sb2.append(" CONSTRAINT STUDENT_ID FOREIGN KEY(STUDENT_ID) REFERENCES STUDENT(ID) ON DELETE CASCADE) ");  //
 
         db.execSQL(sb.toString());
@@ -193,6 +194,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(sb.toString());
 
         InOutManage paramInOutManage = new InOutManage();
+        paramInOutManage.setStudentId(student.getId());
         paramInOutManage.setIsManual(inOutManage.getIsManual());
         paramInOutManage.setLatitude(inOutManage.getLatitude());
         paramInOutManage.setLongitude(inOutManage.getLongitude());
@@ -205,15 +207,16 @@ public class DBHelper extends SQLiteOpenHelper {
     public void insertInOutManage(InOutManage inOutManage) {
         StringBuffer sb = new StringBuffer();
         sb.append(" INSERT INTO IN_OUT_MANAGE ( ");
-        sb.append(" STUDENT_ID , LONGITUDE , LATITUDE , IN_OUT_TIME , IS_MANUAL  ) ");
-        sb.append(" VALUES( ? , ? , ?, ?, ?) ");
+        sb.append(" STUDENT_ID , LONGITUDE , LATITUDE , IN_OUT_TIME , IS_MANUAL, IS_OUT  ) ");
+        sb.append(" VALUES( ? , ? , ?, ?, ?,?) ");
 
         db.execSQL(sb.toString(), new Object[]{
                 inOutManage.getStudentId(),
                 inOutManage.getLongitude(),
                 inOutManage.getLatitude(),
                 inOutManage.getInOutTime(),
-                inOutManage.getIsManual()
+                inOutManage.getIsManual(),
+                inOutManage.getIsOut()
         });
 
     }
@@ -221,7 +224,41 @@ public class DBHelper extends SQLiteOpenHelper {
     // 수동 하차 시
 
 
-    // 조회 할 때
+    // history 조회 할 때
+    public ArrayList<InOutManage> selectInOutMange(Student student) {
+        StringBuffer sb = new StringBuffer();
+        ArrayList<InOutManage> resultList = new ArrayList<>();
+        sb.append(" SELECT STUDENT.ID, STUDENT.NAME, STUDENT.CLASS_NAME, STUDENT.PARENT_PHONE_NUMBER, IN_OUT_MANAGE.SEQ,IN_OUT_MANAGE.LONGITUDE,IN_OUT_MANAGE.LATITUDE ,IN_OUT_MANAGE.IN_OUT_TIME ,IN_OUT_MANAGE.IS_MANUAL, IN_OUT_MANAGE.IS_OUT FROM IN_OUT_MANAGE LEFT JOIN STUDENT ON IN_OUT_MANAGE.STUDENT_ID = STUDENT.ID");
 
+        if (!student.getName().equals("")) {
+            sb.append(" WHERE NAME LIKE '%" + student.getName() + "%'");
+        }
+
+        sb.append(" ORDER BY SEQ");
+
+        Cursor cursor = db.rawQuery(sb.toString(), null);
+
+        while (cursor.moveToNext()) {
+            InOutManage tempInOutManage = new InOutManage();
+
+            Student tempStudent = new Student();
+            tempStudent.setId(cursor.getString(0));
+            tempStudent.setName(cursor.getString(1));
+            tempStudent.setClassName(cursor.getString(2));
+            tempStudent.setParentPhoneNumber(cursor.getString(3));
+            tempInOutManage.setStudent(tempStudent);
+
+
+            tempInOutManage.setLongitude(cursor.getString(5));
+            tempInOutManage.setLatitude(cursor.getString(6));
+            tempInOutManage.setInOutTime(cursor.getString(7));
+            tempInOutManage.setIsManual(cursor.getInt(8));
+            tempInOutManage.setIsOut(cursor.getInt(9));
+
+            resultList.add(tempInOutManage);
+        }
+        return resultList;
+
+    }
 
 }

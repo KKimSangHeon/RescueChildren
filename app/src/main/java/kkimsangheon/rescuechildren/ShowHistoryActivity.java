@@ -21,6 +21,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import kkimsangheon.rescuechildren.DB.DBHelper;
+import kkimsangheon.rescuechildren.DB.VO.InOutManage;
 import kkimsangheon.rescuechildren.DB.VO.Student;
 
 /**
@@ -31,6 +32,7 @@ public class ShowHistoryActivity extends Activity {
 
     ListView listView;
     private ArrayList<Student> studentList;
+    private ArrayList<InOutManage> inOutManageList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +65,8 @@ public class ShowHistoryActivity extends Activity {
 
     public void getInOutList(Student student) {
         // student list 조회
-        studentList = DBHelper.getInstance(ShowHistoryActivity.this).selectRegisteredStudentList(student);
-        ShowHistoryActivity.CustomAdapter adapter = new ShowHistoryActivity.CustomAdapter(this, 0, studentList);
+        inOutManageList = DBHelper.getInstance(ShowHistoryActivity.this).selectInOutMange(student);
+        ShowHistoryActivity.CustomAdapter adapter = new ShowHistoryActivity.CustomAdapter(this, 0, inOutManageList);
         listView.setAdapter(adapter);
     }
 
@@ -76,18 +78,18 @@ public class ShowHistoryActivity extends Activity {
         super.onPause();
     }
 
-    private class CustomAdapter extends ArrayAdapter<Student> {
-        ArrayList<Student> studentList;
+    private class CustomAdapter extends ArrayAdapter<InOutManage> {
+        ArrayList<InOutManage> inOutManageList;
 
-        public CustomAdapter(Context context, int textViewResourceId, ArrayList<Student> studentList) {
-            super(context, textViewResourceId, studentList);
-            this.studentList = studentList;
+        public CustomAdapter(Context context, int textViewResourceId, ArrayList<InOutManage> inOutManageList) {
+            super(context, textViewResourceId, inOutManageList);
+            this.inOutManageList = inOutManageList;
 
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            final Student student = studentList.get(position);
+            final InOutManage inOutManage = inOutManageList.get(position);
 
             View v = convertView;
             if (v == null) {
@@ -97,51 +99,40 @@ public class ShowHistoryActivity extends Activity {
 
             // 리스트뷰 내 item의 name 설정
             TextView studentNameTextView = (TextView) v.findViewById(R.id.textView1);
-            studentNameTextView.setText("Name: " + student.getName());
+            studentNameTextView.setText("Name: " + inOutManage.getStudent().getName());
 
             TextView classNameTextView = (TextView) v.findViewById(R.id.textView2);
-            classNameTextView.setText("Class Name: " + student.getClassName());
+            classNameTextView.setText("Class Name: " + inOutManage.getStudent().getClassName());
 
             TextView studentIdTextView = (TextView) v.findViewById(R.id.textView3);
-//            if (승차면)
-//                studentIdTextView.setText("승차 시간: " + student.getId());
-//            else
-//                studentIdTextView.setText("하차 시간: " + student.getId());
-
+            studentIdTextView.setText((inOutManage.getIsOut() == 0 ? "승차시간" : "하차시간") + inOutManage.getInOutTime());
 
             TextView parentPhoneNumberTextView = (TextView) v.findViewById(R.id.textView4);
-            parentPhoneNumberTextView.setText("수동처리 여부: " + student.getParentPhoneNumber());
+            parentPhoneNumberTextView.setText("수동처리 여부: " + (inOutManage.getIsManual() == 1 ? 'Y' : 'N'));
 
             // ImageView 인스턴스
             ImageView imageView = (ImageView) v.findViewById(R.id.imageView);
             // 추 후 사진적용할 때 사용
 
 
-            ImageButton deleteStudentButton = (ImageButton) v.findViewById(R.id.imageButton);
+            ImageButton imageButton = (ImageButton) v.findViewById(R.id.imageButton);
+            imageButton.setImageResource(R.drawable.more);
+            imageButton.setBackgroundColor(0x000000);
 
-            deleteStudentButton.setOnClickListener(new View.OnClickListener() {
+            imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
                     // 정보 더 확인하는 용으로 사용.. 위도,경도,등등
 
 
-                    String message = "삭제대상" + "\nName : " + student.getName() + "\nClass Name: " + student.getClassName() + "\nID: " + student.getId() + "\nP/N: " + student.getParentPhoneNumber();
+                    String message = "P/N : " + inOutManage.getStudent().getParentPhoneNumber()+"\nLongitude : "+inOutManage.getLongitude()+"\nLatitude : "+inOutManage.getLatitude();
 
                     AlertDialog.Builder alertBuilder = new AlertDialog.Builder(ShowHistoryActivity.this); // 빌더 객체 생성
                     alertBuilder.setTitle("등록된 데이터 제거") // 제목
                             .setMessage(message) // 내용
                             .setCancelable(false)
-                            .setPositiveButton("Yes",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int whichButton) {
-                                            DBHelper.getInstance(ShowHistoryActivity.this).deleteStudent(student);
-                                            Toast.makeText(ShowHistoryActivity.this, student.getName() + "님의 데이터가 제거되었습니다.", Toast.LENGTH_LONG).show();
-                                            getInOutList(new Student());
-                                        }
-
-
-                                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            .setNegativeButton("창 닫기", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.cancel();  // 대회상자 종료
