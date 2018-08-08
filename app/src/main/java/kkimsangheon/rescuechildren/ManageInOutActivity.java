@@ -135,6 +135,7 @@ public class ManageInOutActivity extends NFCReadHelper {
 
     public void getStudentList(Student student) {
         // student list 조회
+        student.setIsOrderByCuttentTagTime(1);
         studentList = DBHelper.getInstance(ManageInOutActivity.this).selectRegisteredStudentList(student);
         ManageInOutActivity.CustomAdapter adapter = new ManageInOutActivity.CustomAdapter(this, 0, studentList);
         listView.setAdapter(adapter);

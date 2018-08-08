@@ -50,6 +50,7 @@ public class DBHelper extends SQLiteOpenHelper {
         sb.append(" CLASS_NAME TEXT, ");
         sb.append(" CURRENT_TAG_TIME TEXT, ");
         sb.append(" IS_OUT INTEGER, ");  //  0 이면 승차
+        sb.append(" REGISTERED_TIME TEXT, ");
         sb.append(" PARENT_PHONE_NUMBER TEXT ) "); // SQLite Database로 쿼리 실행
 
         StringBuffer sb2 = new StringBuffer();
@@ -81,15 +82,20 @@ public class DBHelper extends SQLiteOpenHelper {
 
         StringBuffer sb = new StringBuffer();
         sb.append(" INSERT INTO STUDENT ( ");
-        sb.append(" ID, NAME, CLASS_NAME, IS_OUT, PARENT_PHONE_NUMBER ) ");
-        sb.append(" VALUES( ? , ? , ?, ?, ?) ");
+        sb.append(" ID, NAME, CLASS_NAME, IS_OUT, PARENT_PHONE_NUMBER, REGISTERED_TIME ) ");
+        sb.append(" VALUES( ? , ? , ?, ?, ?, ?) ");
+
+        long time = System.currentTimeMillis();
+        SimpleDateFormat dayTime = new SimpleDateFormat("MM월dd hh:mm:ss");
+        String dateStr = dayTime.format(new Date(time));
 
         db.execSQL(sb.toString(), new Object[]{
                 student.getId(),
                 student.getName(),
                 student.getClassName(),
                 student.getIsOut(),
-                student.getParentPhoneNumber()
+                student.getParentPhoneNumber(),
+                dateStr
         });
 
     }
@@ -144,7 +150,7 @@ public class DBHelper extends SQLiteOpenHelper {
         Student resultStudent;
 
         StringBuffer sb = new StringBuffer();
-        sb.append(" SELECT ID, NAME, CLASS_NAME, IS_OUT, PARENT_PHONE_NUMBER,CURRENT_TAG_TIME FROM STUDENT WHERE 1=1");
+        sb.append(" SELECT ID, NAME, CLASS_NAME, IS_OUT, PARENT_PHONE_NUMBER,CURRENT_TAG_TIME,REGISTERED_TIME FROM STUDENT WHERE 1=1");
 
         if (!student.getName().equals("")) {
             sb.append(" AND NAME LIKE '%" + student.getName() + "%'");
@@ -156,6 +162,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
         if (student.getIsOut() == 0) {
             sb.append(" AND IS_OUT = 0");
+        }
+
+        if (student.getIsOrderByRegisteredTime() == 1) {
+            sb.append(" ORDER BY REGISTERED_TIME");
+        }
+
+        if (student.getIsOrderByCuttentTagTime() == 1) {
+            sb.append(" ORDER BY CURRENT_TAG_TIME");
         }
 
         Cursor cursor = db.rawQuery(sb.toString(), null);
@@ -201,7 +215,6 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
 
-
         StringBuffer sb = new StringBuffer();
         sb.append("UPDATE STUDENT SET IS_OUT = 1, CURRENT_TAG_TIME = '" + dateStr + "' WHERE IS_OUT=0 ");
 
@@ -218,7 +231,7 @@ public class DBHelper extends SQLiteOpenHelper {
         // 5분 이내에 다시 찍었을 경우 이미 처리되었다고 출력
 
         long time = System.currentTimeMillis();
-        SimpleDateFormat dayTime = new SimpleDateFormat("MM월dd hh:mm:ss");
+        SimpleDateFormat dayTime = new SimpleDateFormat("MM월dd일 hh:mm:ss");
         String dateStr = dayTime.format(new Date(time));
 
         StringBuffer sb = new StringBuffer();

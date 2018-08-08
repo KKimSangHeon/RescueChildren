@@ -12,6 +12,8 @@ public class Student {
     private String parentPhoneNumber;
     private String currentTagTime;
     private int isOut;  //최근 승차했는지 하차했는지 여부
+    private int isOrderByRegisteredTime;
+    private int isOrderByCuttentTagTime;
 
     public Student() {
         this.id = "";
@@ -20,6 +22,24 @@ public class Student {
         this.parentPhoneNumber = "";
         this.currentTagTime = "";
         this.isOut = -1;
+        this.isOrderByRegisteredTime = 0;
+        this.isOrderByCuttentTagTime = 0;
+    }
+
+    public int getIsOrderByCuttentTagTime() {
+        return isOrderByCuttentTagTime;
+    }
+
+    public void setIsOrderByCuttentTagTime(int isOrderByCuttentTagTime) {
+        this.isOrderByCuttentTagTime = isOrderByCuttentTagTime;
+    }
+
+    public int getIsOrderByRegisteredTime() {
+        return isOrderByRegisteredTime;
+    }
+
+    public void setIsOrderByRegisteredTime(int isOrderByRegisteredTime) {
+        this.isOrderByRegisteredTime = isOrderByRegisteredTime;
     }
 
     public String getCurrentTagTime() {

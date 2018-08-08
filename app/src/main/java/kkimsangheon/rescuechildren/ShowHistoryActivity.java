@@ -129,7 +129,7 @@ public class ShowHistoryActivity extends Activity {
                     String message = "P/N : " + inOutManage.getStudent().getParentPhoneNumber()+"\nLongitude : "+inOutManage.getLongitude()+"\nLatitude : "+inOutManage.getLatitude();
 
                     AlertDialog.Builder alertBuilder = new AlertDialog.Builder(ShowHistoryActivity.this); // 빌더 객체 생성
-                    alertBuilder.setTitle("등록된 데이터 제거") // 제목
+                    alertBuilder.setTitle("추가정보 확인") // 제목
                             .setMessage(message) // 내용
                             .setCancelable(false)
                             .setNegativeButton("창 닫기", new DialogInterface.OnClickListener() {

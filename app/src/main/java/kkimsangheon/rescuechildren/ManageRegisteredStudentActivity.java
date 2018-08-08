@@ -145,6 +145,7 @@ public class ManageRegisteredStudentActivity extends NFCReadHelper {
 
     public void getStudentList(Student student) {
         // student list 조회
+        student.setIsOrderByRegisteredTime(1);
         studentList = DBHelper.getInstance(ManageRegisteredStudentActivity.this).selectRegisteredStudentList(student);
         CustomAdapter adapter = new CustomAdapter(this, 0, studentList);
         listView.setAdapter(adapter);
