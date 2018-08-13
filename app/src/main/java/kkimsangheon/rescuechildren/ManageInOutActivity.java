@@ -40,6 +40,10 @@ import kkimsangheon.rescuechildren.DB.VO.Student;
 import kkimsangheon.rescuechildren.NFCHelper.NFCReadHelper;
 
 
+ // 이 액티비티가 켜져있을 때 지속적으로 위치를 서버로 전송할것.
+ // 서버구성은 Node.js로 구성할 예정
+ //
+
 public class ManageInOutActivity extends NFCReadHelper {
     ListView listView;
     private ArrayList<Student> studentList;
